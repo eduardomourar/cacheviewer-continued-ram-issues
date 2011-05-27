@@ -98,7 +98,7 @@ nsAboutCacheViewer.prototype = {
 	},
 	
 	//classDescription: "About Module for about:cacheviewer",
-	classID: Components.ID("{87020d13-a340-43a0-afe8-510dfe567c57}"),
+	classID: Components.ID("{30E08C68-889E-11E0-95EF-DA7E4824019B}"),
 	//contractID: "@mozilla.org/network/protocol/about;1?what=cacheviewer",
 	QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule])
 };
