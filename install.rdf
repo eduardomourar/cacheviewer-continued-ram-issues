@@ -6,7 +6,7 @@
     <Description about="urn:mozilla:install-manifest">
 
 	<em:id>{71328583-3CA7-4809-B4BA-570A85818FBB}</em:id>
-	<em:version>0.7b</em:version>
+	<em:version>0.1</em:version>
 
 	<!-- Target Application this extension can install into,
 		with minimum and maximum supported versions. -->
@@ -20,14 +20,16 @@
 	</em:targetApplication>
 
 	<!-- Front End MetaData -->
-	<em:name>CacheViewer</em:name>
-	<em:description>Allows searching and sorting cache files</em:description>
+	<em:name>CacheViewer Continued</em:name>
+	<em:description>Allows searching and sorting cache files.</em:description>
 	
-	<!--<em:homepageURL>http://tinybenki.sblo.jp/</em:homepageURL>-->
 	<em:optionsURL>chrome://cacheviewer/content/options.xul</em:optionsURL>
-	<!--<em:updateURL>http://benki.tank.jp/xpi/update.xml</em:updateURL>-->
 	
 	<em:creator>The Tiny BENKI</em:creator>
+	<!--<em:homepageURL>http://tinybenki.sblo.jp/</em:homepageURL>-->
+
+	<em:developer>James Sumners</em:developer>
+	<!--<em:homepageURL>http://jrfom.com/</em:homepageURL>-->
 	
 	<em:translator>The Zero</em:translator>		<!-- cs-CZ -->
 	<em:translator>Joergen</em:translator>		<!-- da-DK -->
