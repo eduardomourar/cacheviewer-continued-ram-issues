@@ -17,7 +17,7 @@
  * Portions created by the Initial Developer are Copyright (C) 2010
  * The Tiny BENKI. All Rights Reserved.
  *
- * Contributor(s): The Tiny BENKI
+ * Contributor(s): The Tiny BENKI, James Sumners
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
