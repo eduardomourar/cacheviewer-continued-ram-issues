@@ -37,6 +37,13 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cr = Components.results;
 
+/*
+const DEBUG = true;
+var start, stop;
+if (DEBUG)
+	start = new Date();
+*/
+
 var CacheViewer = {
 	
 	// ***** Members *****
@@ -49,7 +56,6 @@ var CacheViewer = {
 	_metaData: "",
 	_visitAll: true,
 	_isLoading: false,
-	_isDooming: false,
 	_entries: null,
 	
 	get _cacheService() {
@@ -75,8 +81,6 @@ var CacheViewer = {
 		
 		this._tree = document.getElementById("cacheTree");
 		this._bundle = document.getElementById("strings");
-		
-		this._label = document.getElementById("selectionCountLabel");
 		
 		this._rdf = new RDF();
 		this._root = this._rdf.makeSeqContainer(this._rdf.RDF_ITEM_ROOT);
@@ -147,11 +151,14 @@ var CacheViewer = {
 					self._tree.builder.rebuild();
 					self._toggleButton(self._isLoading = false);
 					document.getElementById("search").focus();
+					/*
+					if (DEBUG) {
+						stop = new Date();
+						dump("launch time: "+(stop.getTime()-start.getTime())+" ms\n");
+					}
+					*/
 					return;
 				}
-				
-				if (!self._root)
-					return;
 				
 				var resource = rs.GetResource(index);
 				self._root.AppendElement(resource);
@@ -224,105 +231,34 @@ var CacheViewer = {
 	},
 	
 	openCache: function CV_openCache() {
-		var resources = this._getResourcesAtSelection();
-		if (!resources || this._isDooming) return;
+		var resource = this._getResourceAtCurrentIndex();
+		if (!resource) return;
 		
-		if (!this._confirm(resources.length))
-			return;
+		var key = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"key");
 		
-		var urls = new Array();
-		for (var i=0; i<resources.length; i++) {
-			urls.push(this._rdf.getLiteralProperty(resources[i], this._rdf.NS_CACHEVIEWER+"key"));
-		}
-		this._getBrowser().loadTabs(urls, false, false);
+		this._getBrowser().selectedTab = this._getBrowser().addTab(key);
 	},
 	
 	deleteCache: function CV_deleteCache() {
-		if (this._isLoading || this._isDooming) return;
+		if (this._isLoading) return;
 		
-		var resources = this._getResourcesAtSelection();
-		if (!resources) return;
+		var resource = this._getResourceAtCurrentIndex();
+		if (!resource) return;
 		
-		var it = new Iterator(resources);
+		var key = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"key");
+		var client = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"clnt");
+		var stream = this._rdf.getIntProperty(resource, this._rdf.NS_CACHEVIEWER+"strm");
+		var entry = this._openCacheEntry(key, client, stream);
+		if (!entry) return;
 		
-		var timer = Components.classes["@mozilla.org/timer;1"]
-					.createInstance(Components.interfaces.nsITimer);
+		entry.doom();
+		entry.close();
 		
-		var self = this;
-		function timerCallback() {}
-		timerCallback.prototype = {
-			observe: function(aTimer, aTopic, aData) {
-				try {
-					var [i, resource] = it.next();
-				} catch(e) {
-					// Get currentIndex before "endUpdateBatch()". 
-					//dump(self._tree.view.selection.currentIndex+" : "+self._tree.view.rowCount+"\n");
-					var currentIndex = self._tree.view.selection.currentIndex;
-					
-					self._DBConn.commitTransaction();
-					self._rdf.datasource.endUpdateBatch();
-					self._tree.builder.rebuild();
-					
-					// Get rowCount after "endUpdateBatch()". 
-					//dump(self._tree.view.selection.currentIndex+" : "+self._tree.view.rowCount+"\n");
-					var rowCount = self._tree.view.rowCount;
-					if (rowCount > 0) {
-						if (rowCount <= currentIndex) {
-							self._tree.view.selection.select(rowCount-1);
-							self._tree.treeBoxObject.ensureRowIsVisible(rowCount-1);
-						} else {
-							self._tree.view.selection.select(currentIndex);
-							self._tree.treeBoxObject.ensureRowIsVisible(currentIndex);
-						}
-					} else {
-						document.getElementById("cacheInfo").value = "";
-					}	
-					var cacheService = Cc["@mozilla.org/network/cache-service;1"]
-									.getService(Ci.nsICacheService);
-					self._visitAll = false;
-					cacheService.visitEntries(self);
-					self._toggleButton(self._isDooming = false);
-					return;
-				}
-				
-				/*
-				var dev = self._rdf.getLiteralProperty(resource, self._rdf.NS_CACHEVIEWER+"dev");
-				dump(dev+"\n");
-				if (dev == "memory") {
-					timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
-					return;
-				}
-				*/
-				
-				if (!self._rdf)
-					return;
-					
-				var key = self._rdf.getLiteralProperty(resource, self._rdf.NS_CACHEVIEWER+"key");
-				var client = self._rdf.getLiteralProperty(resource, self._rdf.NS_CACHEVIEWER+"clnt");
-				var stream = self._rdf.getIntProperty(resource, self._rdf.NS_CACHEVIEWER+"strm");
-				
-				var entry = self._openCacheEntry(key, client, stream);
-				if (entry) {
-					entry.doom();
-					entry.close();
-				}
-				self._rdf.removeResource(resource, self._rdf.getContainer(self._rdf.RDF_ITEM_ROOT));
-				if (self._tree.ref == self._rdf.RDF_ITEM_SEARCH)
-					self._rdf.removeResource(resource, self._rdf.getContainer(self._rdf.RDF_ITEM_SEARCH));
-				
-				self._DBConn.executeSimpleSQL("DELETE FROM cacheentries WHERE id = "+resource.Value);
-				
-				timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
-			}
-		};
-		this._toggleButton(this._isDooming = true);
-		this._DBConn.beginTransaction();
-		this._rdf.datasource.beginUpdateBatch();
-		timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
+		this._updateUI();
 	},
 	
 	reloadCache: function CV_reloadCache() {
-		if (this._isLoading || this._isDooming) return;
+		if (this._isLoading) return;
 		
 		var image = document.getElementById("previewImage");
 		image.src = "";
@@ -338,8 +274,16 @@ var CacheViewer = {
 	},
 	
 	saveCache: function CV_saveCache() {
-		var resources = this._getResourcesAtSelection();
-		if (!resources || this._isDooming) return;
+		var selection = [];
+		var rangeCount = this._tree.view.selection.getRangeCount();
+		for (var i=0; i<rangeCount; ++i) {
+			var rangeMin = {};
+			var rangeMax = {};
+			this._tree.view.selection.getRangeAt(i, rangeMin, rangeMax);
+			for (var j=rangeMin.value; j<=rangeMax.value; ++j) {
+				selection.push(this._tree.view.getResourceAtIndex(j));
+			}
+		}
 		
 		var pref = Cc["@mozilla.org/preferences-service;1"]
 					.getService(Ci.nsIPrefService)
@@ -351,11 +295,11 @@ var CacheViewer = {
 		
 		var fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
 		
-		if (resources.length > 1) {
+		if (selection.length > 1) {
 			fp.init(window, null, Ci.nsIFilePicker.modeGetFolder);
 		} else {
 			fp.init(window, null, Ci.nsIFilePicker.modeSave);
-			fp.defaultString = this._guessFileName(this._rdf.getLiteralProperty(resources[0], this._rdf.NS_CACHEVIEWER+"key"), this._rdf.getLiteralProperty(resources[0], this._rdf.NS_CACHEVIEWER+"type"))
+			fp.defaultString = this._guessFileName(this._rdf.getLiteralProperty(selection[0], this._rdf.NS_CACHEVIEWER+"key"), this._rdf.getLiteralProperty(selection[0], this._rdf.NS_CACHEVIEWER+"type"))
 		}
 		fp.displayDirectory = lastFolder;
 		var res = fp.show();
@@ -363,7 +307,7 @@ var CacheViewer = {
 			return;
 		
 		var str = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-		if (resources.length > 1) {
+		if (selection.length > 1) {
 			str.data = fp.file.path;
 		} else {
 			str.data = fp.file.parent.path;
@@ -373,12 +317,12 @@ var CacheViewer = {
 		var folder = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
 		folder.initWithPath(fp.file.path);
 		
-		for (i=0; i<resources.length; i++) {
-			var key = this._rdf.getLiteralProperty(resources[i], this._rdf.NS_CACHEVIEWER+"key");
-			var client = this._rdf.getLiteralProperty(resources[i], this._rdf.NS_CACHEVIEWER+"clnt");
-			var stream = this._rdf.getIntProperty(resources[i], this._rdf.NS_CACHEVIEWER+"strm");
-			var device = this._rdf.getLiteralProperty(resources[i], this._rdf.NS_CACHEVIEWER+"dev");
-			var type = this._rdf.getLiteralProperty(resources[i], this._rdf.NS_CACHEVIEWER+"type");
+		for (i=0; i<selection.length; i++) {
+			var key = this._rdf.getLiteralProperty(selection[i], this._rdf.NS_CACHEVIEWER+"key");
+			var client = this._rdf.getLiteralProperty(selection[i], this._rdf.NS_CACHEVIEWER+"clnt");
+			var stream = this._rdf.getIntProperty(selection[i], this._rdf.NS_CACHEVIEWER+"strm");
+			var device = this._rdf.getLiteralProperty(selection[i], this._rdf.NS_CACHEVIEWER+"dev");
+			var type = this._rdf.getLiteralProperty(selection[i], this._rdf.NS_CACHEVIEWER+"type");
 			
 			var descriptor = this._openCacheEntry(key, client, stream);
 			if (!descriptor) {
@@ -386,15 +330,15 @@ var CacheViewer = {
 			}
 			
 			var file = folder.clone();
-			if (resources.length > 1)
+			if (selection.length > 1)
 				file.append(this._guessFileName(key, type));
 				
 			if (res == Ci.nsIFilePicker.returnReplace) {
 				if (!file.exists()) {
-					file.create(Ci.nsILocalFile.NORMAL_FILE_TYPE, 0755);
+					file.create(Ci.nsILocalFile.NORMAL_FILE_TYPE, 0666);
 				}
 			} else
-				file.createUnique(Ci.nsILocalFile.NORMAL_FILE_TYPE, 0755);
+				file.createUnique(Ci.nsILocalFile.NORMAL_FILE_TYPE, 0666);
 			
 			// If memory cache, use "internalSave".
 			// (See chrome://global/content/contentAreaUtils.js)
@@ -454,7 +398,7 @@ var CacheViewer = {
 	search: function CV_search(aSearchString) {
 		aSearchString = aSearchString.replace(/^ +/, "");
 		
-		if (aSearchString || !this._isDooming) {
+		if (aSearchString) {
 			this._rdf.datasource.beginUpdateBatch();
 			this._rdf.removeResource(this._rdf.getResource(this._rdf.RDF_ITEM_SEARCH), null);
 			
@@ -486,18 +430,18 @@ var CacheViewer = {
 	},
 	
 	onSelect: function CV_onSelect() {
-		this._label.value = this._tree.view.selection.count;
-
-		var timer = Components.classes["@mozilla.org/timer;1"]
-					.createInstance(Components.interfaces.nsITimer);
-		var self = this;
-		function timerCallback() {}
-		timerCallback.prototype = {
-			observe: function(aTimer, aTopic, aData) {
-				self._makePreview(self._tree.view.selection.currentIndex);
+		if (this._tree.view.selection.count == 1) {
+			var timer = Components.classes["@mozilla.org/timer;1"]
+						.createInstance(Components.interfaces.nsITimer);
+			var self = this;
+			function timerCallback() {}
+			timerCallback.prototype = {
+				observe: function(aTimer, aTopic, aData) {
+					self._makePreview(self._tree.view.selection.currentIndex);
+				}
 			}
+			timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
 		}
-		timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
 	},
 	
 	onPopupShowing: function CV_onPopupShowing() {
@@ -632,71 +576,11 @@ var CacheViewer = {
 		}
 	},
 	
-	_confirm: function CV__confirm(numTabsToOpen) {
-		var pref = Cc["@mozilla.org/preferences-service;1"]
-					.getService(Ci.nsIPrefBranch);
-
-		const kWarnOnOpenPref = "extensions.cacheviewer.warn_on_open";
-		var reallyOpen = true;
-		if (pref.getBoolPref(kWarnOnOpenPref)) {
-			if (numTabsToOpen >= pref.getIntPref("extensions.cacheviewer.max_open_before_warn")) {
-				var promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-									.getService(Ci.nsIPromptService);
-
-				var warnOnOpen = { value: true };
-
-				var messageKey = "tabs.openWarningMultipleBranded";
-				var openKey = "tabs.openButtonMultiple";
-				const BRANDING_BUNDLE_URI = "chrome://branding/locale/brand.properties";
-				var brandShortName = Cc["@mozilla.org/intl/stringbundle;1"]
-										.getService(Ci.nsIStringBundleService)
-										.createBundle(BRANDING_BUNDLE_URI)
-										.GetStringFromName("brandShortName");
-										
-				var bundle = Cc["@mozilla.org/intl/stringbundle;1"]
-								.getService(Ci.nsIStringBundleService)
-								.createBundle("chrome://browser/locale/places/places.properties");
-								
-				var buttonPressed = promptService.confirmEx(window,
-									bundle.GetStringFromName("tabs.openWarningTitle"),
-									bundle.formatStringFromName(messageKey, [numTabsToOpen, brandShortName], 2),
-									(promptService.BUTTON_TITLE_IS_STRING * promptService.BUTTON_POS_0)
-									+ (promptService.BUTTON_TITLE_CANCEL * promptService.BUTTON_POS_1),
-									bundle.GetStringFromName(openKey), null, null,
-									bundle.formatStringFromName("tabs.openWarningPromptMeBranded",
-									[brandShortName], 1), warnOnOpen);
-
-				reallyOpen = (buttonPressed == 0);
-				
-				if (reallyOpen && !warnOnOpen.value)
-					pref.setBoolPref(kWarnOnOpenPref, false);
-			}
-		}
-		return reallyOpen;
-	},
-	
 	_getResourceAtCurrentIndex: function CV__getResourceAtCurrentIndex() {
 		if (!this._tree.view.selection || this._tree.view.selection.count != 1)
 			return null;
 			
 		return this._tree.view.getResourceAtIndex(this._tree.view.selection.currentIndex);
-	},
-	
-	_getResourcesAtSelection: function () {
-		if (!this._tree.view.selection)
-			return null;
-		
-		var resources = new Array();
-		var rangeCount = this._tree.view.selection.getRangeCount();
-		for (var i=0; i<rangeCount; ++i) {
-			var rangeMin = {};
-			var rangeMax = {};
-			this._tree.view.selection.getRangeAt(i, rangeMin, rangeMax);
-			for (var j=rangeMin.value; j<=rangeMax.value; ++j) {
-				resources.push(this._tree.view.getResourceAtIndex(j));
-			}
-		}
-		return resources;
 	},
 	
 	_guessFileName: function CV__geussFileName(aKey, aMimeType) {
@@ -737,6 +621,31 @@ var CacheViewer = {
 		var windowManager = Cc["@mozilla.org/appshell/window-mediator;1"].getService();
 		var windowManagerInterface = windowManager.QueryInterface(Ci.nsIWindowMediator);
 		return windowManagerInterface.getMostRecentWindow("navigator:browser");
+	},
+	
+	_updateUI: function CV_updateUI() {
+		var currentIndex = this._tree.view.selection.currentIndex;
+		
+		var resource = this._getResourceAtCurrentIndex();
+		
+		this._rdf.removeResource(resource, this._rdf.getContainer(this._rdf.RDF_ITEM_ROOT));
+		if (this._tree.ref == this._rdf.RDF_ITEM_SEARCH)
+			this._rdf.removeResource(resource, this._rdf.getContainer(this._rdf.RDF_ITEM_SEARCH));
+		
+		this._DBConn.executeSimpleSQL("DELETE FROM cacheentries WHERE id = "+resource.Value);
+		
+		var rowCount = this._tree.view.rowCount;
+		if (currentIndex == rowCount)
+			currentIndex--;
+		if (rowCount > 0)
+			this._tree.view.selection.select(currentIndex);
+		else
+			document.getElementById("cacheInfo").value = "";
+		
+		var cacheService = Cc["@mozilla.org/network/cache-service;1"]
+						.getService(Ci.nsICacheService);
+		this._visitAll = false;
+		cacheService.visitEntries(this);
 	},
 	
 	_toggleButton: function CV__toggleButton(aIsLoading) {
@@ -780,7 +689,7 @@ var CacheViewer = {
 // ***** StreamListener for Asynchronous Converter *****
 function StreamListener(aFile) {
 	this._file = aFile;
-	this._data = new Array();
+	this._data = null;
 }
 
 StreamListener.prototype = {
@@ -788,12 +697,11 @@ StreamListener.prototype = {
 	onStartRequest: function(aRequest, aContext) {},
 	
 	onStopRequest: function(aRequest, aContext, aStatusCode) {
-		var data = this._data.join("");
 		var fileOutputStream = Cc["@mozilla.org/network/file-output-stream;1"]
 											.createInstance(Ci.nsIFileOutputStream);
 		try {
-			fileOutputStream.init(this._file, -1, 0755, 0);
-			fileOutputStream.write(data, data.length);
+			fileOutputStream.init(this._file, -1, 0666, 0);
+			fileOutputStream.write(this._data, this._data.length);
 			fileOutputStream.flush();
 		} catch(e) {
 			dump(e+"\n");
@@ -807,7 +715,7 @@ StreamListener.prototype = {
 		var binaryInputStream = Cc["@mozilla.org/binaryinputstream;1"]
 											.createInstance(Ci.nsIBinaryInputStream);
 		binaryInputStream.setInputStream(aInputStream);
-		this._data.push(binaryInputStream.readBytes(binaryInputStream.available()));
+		this._data += binaryInputStream.readBytes(binaryInputStream.available());
 		binaryInputStream.close();
 	}
 };

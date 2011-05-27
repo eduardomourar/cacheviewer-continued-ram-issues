@@ -6,7 +6,7 @@
     <Description about="urn:mozilla:install-manifest">
 
 	<em:id>{71328583-3CA7-4809-B4BA-570A85818FBB}</em:id>
-	<em:version>0.6.3</em:version>
+	<em:version>0.7b</em:version>
 
 	<!-- Target Application this extension can install into,
 		with minimum and maximum supported versions. -->
@@ -14,16 +14,8 @@
 	<em:targetApplication>
 		<Description>
 			<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-			<em:minVersion>3.0</em:minVersion>
-			<em:maxVersion>3.6.*</em:maxVersion>
-		</Description>
-	</em:targetApplication>
-    <!-- SeaMonkey -->
-	<em:targetApplication>
-		<Description>
-			<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
-			<em:minVersion>2.0</em:minVersion>
-			<em:maxVersion>2.0.*</em:maxVersion>
+			<em:minVersion>4.0b7</em:minVersion>
+			<em:maxVersion>4.0b9pre</em:maxVersion>
 		</Description>
 	</em:targetApplication>
 

@@ -37,7 +37,7 @@
 	</keyset>
 	
 	<popupset>
-		<popup id="viewerPopup" onpopupshowing="CacheViewer.onPopupShowing();">
+		<menupopup id="viewerPopup" onpopupshowing="CacheViewer.onPopupShowing();">
 			<menuitem label="&open.label;" accesskey="&open.accesskey;"
 					  oncommand="CacheViewer.openCache();"/>
 			<menuitem label="&save.label;" accesskey="&save.accesskey;"
@@ -45,7 +45,7 @@
 			<menuitem label="&delete.label;" accesskey="&delete.accesskey;"
 					  oncommand="CacheViewer.deleteCache();"
 					  id="deleteCache"/>
-		</popup>
+		</menupopup>
 	</popupset>
 	
 	<hbox id="top-part" persist="height">
@@ -156,11 +156,7 @@
 			</stack>
 		</statusbarpanel>
 		<spacer flex="1"/>
-		<hbox pack="center">
-			<vbox pack="center">
-				<label id="selectionCountLabel"/>
-			</vbox>
-		</hbox>
+		<label id="selectionCountLabel"/>
 		<toolbarbutton id="reload" command="cmd_reload" tooltiptext="&reload.tooltip;"/>
 	</statusbar>
 	
