@@ -1,0 +1,6 @@
+<!ENTITY	title.label		"CacheViewer 設定">
+<!ENTITY	caption.label	"CacheViewer を">
+<!ENTITY	sepwin.label	"別ウィンドウで開く">
+<!ENTITY	sepwin.accesskey "S">
+<!ENTITY	newtab.label	"新しいタブで開く">
+<!ENTITY	newtab.accesskey "N">

@@ -1,0 +1,33 @@
+content	cacheviewer	jar:chrome/cacheviewer.jar!/content/cacheviewer/
+
+overlay	chrome://browser/content/browser.xul	chrome://cacheviewer/content/overlay.xul
+overlay	chrome://navigator/content/navigator.xul	chrome://cacheviewer/content/overlay_sm.xul
+
+skin	cacheviewer	classic/1.0	jar:chrome/cacheviewer.jar!/skin/classic/cacheviewer/
+
+style	chrome://browser/content/browser.xul	chrome://cacheviewer/skin/cacheviewer.css
+style	chrome://navigator/content/navigator.xul	chrome://cacheviewer/skin/cacheviewer.css
+style	chrome://global/content/customizeToolbar.xul	chrome://cacheviewer/skin/cacheviewer.css
+
+locale	cacheviewer	ar	jar:chrome/cacheviewer.jar!/locale/ar/cacheviewer/
+locale	cacheviewer	cs-CZ	jar:chrome/cacheviewer.jar!/locale/cs-CZ/cacheviewer/
+locale	cacheviewer	da-DK	jar:chrome/cacheviewer.jar!/locale/da-DK/cacheviewer/
+locale	cacheviewer	de-DE	jar:chrome/cacheviewer.jar!/locale/de-DE/cacheviewer/
+locale	cacheviewer	en-US	jar:chrome/cacheviewer.jar!/locale/en-US/cacheviewer/
+locale	cacheviewer	es-ES	jar:chrome/cacheviewer.jar!/locale/es-ES/cacheviewer/
+locale	cacheviewer	fr-FR	jar:chrome/cacheviewer.jar!/locale/fr-FR/cacheviewer/
+locale	cacheviewer	he-IL	jar:chrome/cacheviewer.jar!/locale/he-IL/cacheviewer/
+locale	cacheviewer	it-IT	jar:chrome/cacheviewer.jar!/locale/it-IT/cacheviewer/
+locale	cacheviewer	ja	jar:chrome/cacheviewer.jar!/locale/ja/cacheviewer/
+locale	cacheviewer	ko-KR	jar:chrome/cacheviewer.jar!/locale/ko-KR/cacheviewer/
+locale	cacheviewer	nl-NL	jar:chrome/cacheviewer.jar!/locale/nl-NL/cacheviewer/
+locale	cacheviewer	pl-PL	jar:chrome/cacheviewer.jar!/locale/pl-PL/cacheviewer/
+locale	cacheviewer	pt-BR	jar:chrome/cacheviewer.jar!/locale/pt-BR/cacheviewer/
+locale	cacheviewer	pt-PT	jar:chrome/cacheviewer.jar!/locale/pt-PT/cacheviewer/
+locale	cacheviewer	ro-RO	jar:chrome/cacheviewer.jar!/locale/ro-RO/cacheviewer/
+locale	cacheviewer	ru-RU	jar:chrome/cacheviewer.jar!/locale/ru-RU/cacheviewer/
+locale	cacheviewer	sk-SK	jar:chrome/cacheviewer.jar!/locale/sk-SK/cacheviewer/
+locale	cacheviewer	tr-TR	jar:chrome/cacheviewer.jar!/locale/tr-TR/cacheviewer/
+locale	cacheviewer	uk-UA	jar:chrome/cacheviewer.jar!/locale/uk-UA/cacheviewer/
+locale	cacheviewer	zh-CN	jar:chrome/cacheviewer.jar!/locale/zh-CN/cacheviewer/
+locale	cacheviewer	zh-TW	jar:chrome/cacheviewer.jar!/locale/zh-TW/cacheviewer/

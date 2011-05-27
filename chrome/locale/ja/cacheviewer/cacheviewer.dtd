@@ -1,0 +1,27 @@
+<!ENTITY	window.title		"CacheViewer">
+
+<!ENTITY	search.label		"検索：">
+<!ENTITY	search.accesskey	"S">
+<!ENTITY	showall.label		"すべて表示">
+<!ENTITY	showall.accesskey	"w">
+<!ENTITY	reload.tooltip		"キャッシュ一覧を更新">
+
+<!ENTITY	open.label			"ブラウザで開く">
+<!ENTITY	open.accesskey		"O">
+<!ENTITY	save.label			"保存">
+<!ENTITY	save.accesskey		"S">
+<!ENTITY	delete.label		"消す">
+<!ENTITY	delete.accesskey	"D">
+
+<!ENTITY	key.label			"キー">
+<!ENTITY	device.label		"デバイス">
+<!ENTITY	type.label			"MIMEタイプ">
+<!ENTITY	client.label		"クライアント">
+<!ENTITY	size.label			"サイズ">
+<!ENTITY	lastModified.label	"最終更新">
+<!ENTITY	lastFetched.label	"最終取得">
+<!ENTITY	fetchCount.label	"取得回数">
+<!ENTITY	expirationTime.label "有効期限">
+
+<!ENTITY	memory.label		"メモリー：">
+<!ENTITY	disk.label			"ディスク：">

@@ -1,0 +1,23 @@
+<!ENTITY window.title "CacheViewer">
+<!ENTITY search.label "Søg:">
+<!ENTITY search.accesskey "S">
+<!ENTITY showall.label "Vis alle">
+<!ENTITY showall.accesskey "V">
+<!ENTITY reload.tooltip "Genindlæs cacheopslag">
+<!ENTITY open.label "Åbn i browser">
+<!ENTITY open.accesskey "Å">
+<!ENTITY save.label "Gem som">
+<!ENTITY save.accesskey "G">
+<!ENTITY delete.label "Slet">
+<!ENTITY delete.accesskey "S">
+<!ENTITY key.label "Nøgle">
+<!ENTITY device.label "Enhed">
+<!ENTITY type.label "MIME type">
+<!ENTITY client.label "Klient">
+<!ENTITY size.label "Størrelse">
+<!ENTITY lastModified.label "Senest ændret">
+<!ENTITY lastFetched.label "Senest hentet">
+<!ENTITY fetchCount.label "Hentet antal gange">
+<!ENTITY expirationTime.label "Udløbsdato">
+<!ENTITY memory.label "Hukommelse:">
+<!ENTITY disk.label "Disk:">

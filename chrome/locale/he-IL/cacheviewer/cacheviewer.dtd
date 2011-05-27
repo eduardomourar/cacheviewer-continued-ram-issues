@@ -1,0 +1,23 @@
+<!ENTITY window.title "CacheViewer">
+<!ENTITY search.label "חיפוש:">
+<!ENTITY search.accesskey "S">
+<!ENTITY showall.label "הצג הכל">
+<!ENTITY showall.accesskey "w">
+<!ENTITY reload.tooltip "רענן ערכי מטמון">
+<!ENTITY open.label "פתח בדפדפן">
+<!ENTITY open.accesskey "O">
+<!ENTITY save.label "שמור בשם...">
+<!ENTITY save.accesskey "S">
+<!ENTITY delete.label "מחק">
+<!ENTITY delete.accesskey "D">
+<!ENTITY key.label "מפתח">
+<!ENTITY device.label "התקן">
+<!ENTITY type.label "סוג מוצר">
+<!ENTITY client.label "לקוח">
+<!ENTITY size.label "גודל">
+<!ENTITY lastModified.label "שונה לאחרונה">
+<!ENTITY lastFetched.label "נמשך לאחרונה">
+<!ENTITY fetchCount.label "מונה משיכות">
+<!ENTITY expirationTime.label "זמן תפוגה">
+<!ENTITY memory.label "זכרון:">
+<!ENTITY disk.label "דיסק:">
