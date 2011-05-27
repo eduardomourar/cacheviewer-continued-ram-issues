@@ -1,0 +1,23 @@
+<!ENTITY window.title "CacheViewer">
+<!ENTITY search.label "Search:">
+<!ENTITY search.accesskey "S">
+<!ENTITY showall.label "Show All">
+<!ENTITY showall.accesskey "w">
+<!ENTITY reload.tooltip "Reload cache entries">
+<!ENTITY open.label "Open in Browser">
+<!ENTITY open.accesskey "O">
+<!ENTITY save.label "Save As...">
+<!ENTITY save.accesskey "S">
+<!ENTITY delete.label "Delete">
+<!ENTITY delete.accesskey "D">
+<!ENTITY key.label "Key">
+<!ENTITY device.label "Device">
+<!ENTITY type.label "MIME Type">
+<!ENTITY client.label "Client">
+<!ENTITY size.label "Size">
+<!ENTITY lastModified.label "Last Modified">
+<!ENTITY lastFetched.label "Last Fetched">
+<!ENTITY fetchCount.label "Fetch Count">
+<!ENTITY expirationTime.label "Expiration Time">
+<!ENTITY memory.label "Memory:">
+<!ENTITY disk.label "Disk:">

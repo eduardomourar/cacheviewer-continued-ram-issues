@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+    <Description about="urn:mozilla:install-manifest">
+
+	<em:id>{71328583-3CA7-4809-B4BA-570A85818FBB}</em:id>
+	<em:version>0.6.3</em:version>
+
+	<!-- Target Application this extension can install into,
+		with minimum and maximum supported versions. -->
+    <!-- Firefox -->
+	<em:targetApplication>
+		<Description>
+			<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+			<em:minVersion>3.0</em:minVersion>
+			<em:maxVersion>3.6.*</em:maxVersion>
+		</Description>
+	</em:targetApplication>
+    <!-- SeaMonkey -->
+	<em:targetApplication>
+		<Description>
+			<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
+			<em:minVersion>2.0</em:minVersion>
+			<em:maxVersion>2.0.*</em:maxVersion>
+		</Description>
+	</em:targetApplication>
+
+	<!-- Front End MetaData -->
+	<em:name>CacheViewer</em:name>
+	<em:description>Allows searching and sorting cache files</em:description>
+	
+	<!--<em:homepageURL>http://tinybenki.sblo.jp/</em:homepageURL>-->
+	<em:optionsURL>chrome://cacheviewer/content/options.xul</em:optionsURL>
+	<!--<em:updateURL>http://benki.tank.jp/xpi/update.xml</em:updateURL>-->
+	
+	<em:creator>The Tiny BENKI</em:creator>
+	
+	<em:translator>The Zero</em:translator>		<!-- cs-CZ -->
+	<em:translator>Joergen</em:translator>		<!-- da-DK -->
+	<em:translator>Team erweiterungen.de</em:translator>	<!-- de-DE -->
+	<em:translator>chuzo</em:translator>		<!-- es-ES -->
+	<em:translator>myahoo</em:translator>		<!-- fr-FR -->
+	<em:translator>SiiiE</em:translator>		<!-- he-IL -->
+	<em:translator>Underpass</em:translator>	<!-- it-IT -->
+	<em:translator>wtspout</em:translator>		<!-- ko-KR -->
+	<em:translator>markh</em:translator>		<!-- nl-NL -->
+	<em:translator>vatzec</em:translator>		<!-- pl-PL -->
+	<!--<em:translator>unknown</em:translator>--><!-- pt-BR -->
+	<em:translator>ricardosimoes</em:translator><!-- pt-PT -->
+	<em:translator>erglo</em:translator>		<!-- ro-RO -->
+	<em:translator>Modex</em:translator>		<!-- ru-RU -->
+	<em:translator>Gianny111</em:translator>	<!-- sk-SK -->
+	<em:translator>eveterinary</em:translator>	<!-- tr-TR -->
+	<em:translator>tymofiy</em:translator>		<!-- uk-UA -->
+	<em:translator>WangKing</em:translator>		<!-- zh-CN -->
+	<em:translator>shyangs</em:translator>		<!-- zh-TW -->
+	
+	</Description>
+
+</RDF>
