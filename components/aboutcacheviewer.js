@@ -97,12 +97,10 @@ nsAboutCacheViewer.prototype = {
 		}
 	},
 	
-	classDescription: "About Module for about:cacheviewer",
+	//classDescription: "About Module for about:cacheviewer",
 	classID: Components.ID("{87020d13-a340-43a0-afe8-510dfe567c57}"),
-	contractID: "@mozilla.org/network/protocol/about;1?what=cacheviewer",
+	//contractID: "@mozilla.org/network/protocol/about;1?what=cacheviewer",
 	QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule])
 };
 
-function NSGetModule(aCompMgr, aFileSpec) {
-	return XPCOMUtils.generateModule([nsAboutCacheViewer]);
-}
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([nsAboutCacheViewer]);

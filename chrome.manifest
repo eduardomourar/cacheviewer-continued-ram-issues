@@ -1,12 +1,10 @@
 content	cacheviewer	jar:chrome/cacheviewer.jar!/content/cacheviewer/
 
 overlay	chrome://browser/content/browser.xul	chrome://cacheviewer/content/overlay.xul
-overlay	chrome://navigator/content/navigator.xul	chrome://cacheviewer/content/overlay_sm.xul
 
 skin	cacheviewer	classic/1.0	jar:chrome/cacheviewer.jar!/skin/classic/cacheviewer/
 
 style	chrome://browser/content/browser.xul	chrome://cacheviewer/skin/cacheviewer.css
-style	chrome://navigator/content/navigator.xul	chrome://cacheviewer/skin/cacheviewer.css
 style	chrome://global/content/customizeToolbar.xul	chrome://cacheviewer/skin/cacheviewer.css
 
 locale	cacheviewer	ar	jar:chrome/cacheviewer.jar!/locale/ar/cacheviewer/
@@ -31,3 +29,6 @@ locale	cacheviewer	tr-TR	jar:chrome/cacheviewer.jar!/locale/tr-TR/cacheviewer/
 locale	cacheviewer	uk-UA	jar:chrome/cacheviewer.jar!/locale/uk-UA/cacheviewer/
 locale	cacheviewer	zh-CN	jar:chrome/cacheviewer.jar!/locale/zh-CN/cacheviewer/
 locale	cacheviewer	zh-TW	jar:chrome/cacheviewer.jar!/locale/zh-TW/cacheviewer/
+
+component	{87020d13-a340-43a0-afe8-510dfe567c57}		components/aboutcacheviewer.js
+contract	@mozilla.org/network/protocol/about;1?what=cacheviewer	{87020d13-a340-43a0-afe8-510dfe567c57}
