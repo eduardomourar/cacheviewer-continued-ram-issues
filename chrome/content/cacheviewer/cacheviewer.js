@@ -560,15 +560,25 @@ var CacheViewer = {
 		document.getElementById("cacheInfo").value = value;
 		
 		var url = "chrome://cacheviewer/content/not_image.png";
+		
 		if ((type.indexOf("image") == 0) ||
 			(key.match(/.*(\.png|\.gif|\.jpg|\.ico|\.bmp)$/i))) {
-				url = "about:cacheviewer?"+key;
+				//url = "about:cacheviewer?"+key;
+				if (cacheFile != null) {
+					// Use the local file
+					url = "file://" + cacheFile.path;
+				} else {
+					// Use the remote file
+					url = key;
+				}
 		}
 
 		var image = document.getElementById("previewImage");
 		image.src = url;
 		if (image.hasAttribute("style"))
 			image.removeAttribute("style");
+		
+		
 		
 		var self = this;
 		image.onload = function() {
