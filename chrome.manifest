@@ -2,7 +2,7 @@ content	cacheviewer	chrome/content/cacheviewer/
 
 overlay	chrome://browser/content/browser.xul	chrome://cacheviewer/content/overlay.xul
 
-skin	cacheviewer	classic/1.0	chrome/cacheviewer/skin/classic/cacheviewer/
+skin	cacheviewer	classic/1.0	chrome/skin/classic/cacheviewer/
 
 style	chrome://browser/content/browser.xul	chrome://cacheviewer/skin/cacheviewer.css
 style	chrome://global/content/customizeToolbar.xul	chrome://cacheviewer/skin/cacheviewer.css
