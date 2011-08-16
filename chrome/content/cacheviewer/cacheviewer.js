@@ -231,30 +231,49 @@ var CacheViewer = {
 	},
 	
 	openCache: function CV_openCache() {
-		var resource = this._getResourceAtCurrentIndex();
-		if (!resource) return;
+		var resources = this._getResourceAtCurrentIndex();
+		if (resources.length != 1) return;
 		
-		var key = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"key");
+		var key = this._rdf.getLiteralProperty(resources[0].obj, this._rdf.NS_CACHEVIEWER+"key");
 		
 		this._getBrowser().selectedTab = this._getBrowser().addTab(key);
 	},
 	
 	deleteCache: function CV_deleteCache() {
+		var client,
+			key,
+			resource = {},
+			resources = [],
+			stream,
+			uiIndexes = [];
+		
 		if (this._isLoading) return;
 		
-		var resource = this._getResourceAtCurrentIndex();
-		if (!resource) return;
+		resources = this._getResourceAtCurrentIndex();
+		if (resources.length < 1) {
+			return;
+		}
 		
-		var key = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"key");
-		var client = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"clnt");
-		var stream = this._rdf.getIntProperty(resource, this._rdf.NS_CACHEVIEWER+"strm");
-		var entry = this._openCacheEntry(key, client, stream);
-		if (!entry) return;
+		for (var i = 0, j = resources.length; i < j; i += 1) {
+			resource = resources[i].obj;
+			key = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"key");
+			client = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"clnt");
+			stream = this._rdf.getIntProperty(resource, this._rdf.NS_CACHEVIEWER+"strm");
+			entry = this._openCacheEntry(key, client, stream);
+			
+			//alert('key = ' + key + '\nclient = ' + client + '\nstream = ' + stream + '\nentry = ' + entry);
+			
+			if (!entry) {
+				continue;
+			}
+			
+			entry.doom();
+			entry.close();
+			
+			uiIndexes.push(resources[i].rowId);
+		}
 		
-		entry.doom();
-		entry.close();
-		
-		this._updateUI();
+		this._updateUI(uiIndexes);
 	},
 	
 	reloadCache: function CV_reloadCache() {
@@ -587,10 +606,30 @@ var CacheViewer = {
 	},
 	
 	_getResourceAtCurrentIndex: function CV__getResourceAtCurrentIndex() {
-		if (!this._tree.view.selection || this._tree.view.selection.count != 1)
-			return null;
+		var resources = [],
+			resource = {},
+			startObj = {},
+			endObj = {};
 			
-		return this._tree.view.getResourceAtIndex(this._tree.view.selection.currentIndex);
+		if (!this._tree.view.selection || this._tree.view.selection.count < 1) {
+			return null;
+		}
+		
+		// https://developer.mozilla.org/en/XUL_Tutorial/Tree_Selection
+		for (var i = 0, j = this._tree.view.selection.getRangeCount(); i < j; i += 1) {
+			this._tree.view.selection.getRangeAt(i, startObj, endObj);
+			
+			for (var x = startObj.value; x <= endObj.value; x += 1) {
+				resource = {
+					obj: this._tree.view.getResourceAtIndex(x),
+					rowId: x
+				};
+				
+				resources.push(resource);
+			}
+		}
+		
+		return resources;
 	},
 	
 	_guessFileName: function CV__geussFileName(aKey, aMimeType) {
@@ -633,29 +672,37 @@ var CacheViewer = {
 		return windowManagerInterface.getMostRecentWindow("navigator:browser");
 	},
 	
-	_updateUI: function CV_updateUI() {
-		var currentIndex = this._tree.view.selection.currentIndex;
+	_updateUI: function CV_updateUI(indexes) {
+		// This is about as ugly as you can get.
+		var update = function(index) {
+			var cacheService,
+				resource = this._tree.view.getResourceAtIndex(index),
+				rowCount;
+			
+			this._rdf.removeResource(resource, this._rdf.getContainer(this._rdf.RDF_ITEM_ROOT));
+			if (this._tree.ref === this._rdf.RDF_ITEM_SEARCH) {
+				this._rdf.removeResource(resource, this._rdf.getContainer(this._rdf.RDF_ITEM_SEARCH));
+			}
+			this._DBConn.executeSimpleSQL('DELETE FROM cacheentries WHERE id = ' + resource.Value);
+			
+			rowCount = this._tree.view.rowCount;
+			if (index === rowCount) {
+				index -= 1;
+			}
+			if (rowCount > 0) {
+				this._tree.view.selection.select(index);
+			} else {
+				document.getElementById('cacheInfo').value = '';
+			}
+			
+			cacheService = Cc["@mozilla.org/network/cache-service;1"].getService(Ci.nsICacheService);
+			this._visitAll = false;
+			cacheService.visitEntries(this);
+		};
 		
-		var resource = this._getResourceAtCurrentIndex();
-		
-		this._rdf.removeResource(resource, this._rdf.getContainer(this._rdf.RDF_ITEM_ROOT));
-		if (this._tree.ref == this._rdf.RDF_ITEM_SEARCH)
-			this._rdf.removeResource(resource, this._rdf.getContainer(this._rdf.RDF_ITEM_SEARCH));
-		
-		this._DBConn.executeSimpleSQL("DELETE FROM cacheentries WHERE id = "+resource.Value);
-		
-		var rowCount = this._tree.view.rowCount;
-		if (currentIndex == rowCount)
-			currentIndex--;
-		if (rowCount > 0)
-			this._tree.view.selection.select(currentIndex);
-		else
-			document.getElementById("cacheInfo").value = "";
-		
-		var cacheService = Cc["@mozilla.org/network/cache-service;1"]
-						.getService(Ci.nsICacheService);
-		this._visitAll = false;
-		cacheService.visitEntries(this);
+		for (var i = 0, j = indexes.length; i < j; i += 1) {
+			update.call(this, indexes[i]);
+		}
 	},
 	
 	_toggleButton: function CV__toggleButton(aIsLoading) {
