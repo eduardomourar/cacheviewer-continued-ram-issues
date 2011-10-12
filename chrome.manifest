@@ -1,6 +1,7 @@
 content	cacheviewer	chrome/content/cacheviewer/
 
-overlay	chrome://browser/content/browser.xul	chrome://cacheviewer/content/overlay.xul
+overlay	chrome://browser/content/browser.xul	chrome://cacheviewer/content/overlay-l6.xul appversion<6
+overlay chrome://browser/content/browser.xul	chrome://cacheviewer/content/overlay-6o.xul appversion>=6
 
 skin	cacheviewer	classic/1.0	chrome/skin/classic/cacheviewer/
 
