@@ -512,8 +512,12 @@ var CacheViewer = {
 		if (!this._visitAll)
 			return false;
 		
+		/**
+		 * Resolve BitBucket issue #9.
+		 * We may want to add a toggle in the future.
 		if (aEntryInfo.dataSize == 0)
 			return true;
+		*/
 		
 		if (aEntryInfo.key.indexOf("http") == 0) {
 			this._entries.push(new Array(
