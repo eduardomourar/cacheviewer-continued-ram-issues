@@ -10,27 +10,27 @@
 
 	<!-- Target Application this extension can install into,
 		with minimum and maximum supported versions. -->
-    <!-- Firefox -->
+    	<!-- Firefox -->
 	<em:targetApplication>
 		<Description>
 			<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 			<em:minVersion>4.0b7</em:minVersion>
-			<em:maxVersion>8.*</em:maxVersion>
+			<em:maxVersion>10.*</em:maxVersion>
 		</Description>
 	</em:targetApplication>
 
 	<!-- Front End MetaData -->
 	<em:name>CacheViewer Continued</em:name>
 	<em:description>Allows searching and sorting cache files.</em:description>
-	
+
 	<em:optionsURL>chrome://cacheviewer/content/options.xul</em:optionsURL>
-	
+
 	<em:creator>The Tiny BENKI</em:creator>
 	<!--<em:homepageURL>http://tinybenki.sblo.jp/</em:homepageURL>-->
 
 	<em:developer>James Sumners</em:developer>
 	<!--<em:homepageURL>http://jrfom.com/</em:homepageURL>-->
-	
+
 	<em:translator>The Zero</em:translator>		<!-- cs-CZ -->
 	<em:translator>Joergen</em:translator>		<!-- da-DK -->
 	<em:translator>Team erweiterungen.de</em:translator>	<!-- de-DE -->
@@ -50,7 +50,7 @@
 	<em:translator>tymofiy</em:translator>		<!-- uk-UA -->
 	<em:translator>WangKing</em:translator>		<!-- zh-CN -->
 	<em:translator>shyangs</em:translator>		<!-- zh-TW -->
-	
+
 	</Description>
 
 </RDF>
