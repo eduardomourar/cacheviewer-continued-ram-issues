@@ -1,8 +1,15 @@
 {
-	"folders":
-	[
-		{
-			"path": "."
-		}
-	]
+  "folders":
+  [
+    {
+      "path": "."
+    }
+  ],
+  "settings":
+  {
+    "jshint_options":
+    {
+      "es5":"true"
+    }
+  }
 }
