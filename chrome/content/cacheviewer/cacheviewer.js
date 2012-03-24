@@ -137,6 +137,10 @@ var CacheViewer = {
 
     var self = this;
 
+    // Init labels
+    document.getElementById("selectionCountLabel").textContent =
+      this._tree.view.selection.count;
+
     function timerCallback() {}
     timerCallback.prototype = {
 
@@ -492,20 +496,24 @@ var CacheViewer = {
   },
 
   onSelect: function CV_onSelect() {
-    var self,
+    var countLabel = document.getElementById("selectionCountLabel"),
+        sel = this._tree.view.selection,
+        self,
         timer,
         timerCallback = function(){};
 
-    if (this._tree.view.selection.count == 1) {
+    if (sel.count === 1) {
       timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
       self = this;
       timerCallback.prototype = {
         observe: function(aTimer, aTopic, aData) {
-          self._makePreview(self._tree.view.selection.currentIndex);
+          self._makePreview(sel.currentIndex);
         }
       };
       timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
     }
+
+    countLabel.textContent = sel.count;
   },
 
   onPopupShowing: function CV_onPopupShowing() {
