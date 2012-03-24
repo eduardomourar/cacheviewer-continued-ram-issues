@@ -153,8 +153,8 @@ var CacheViewer = {
 
         try {
           pair = it.next();
-          index = pair.index;
-          value = pair.value;
+          index = pair[0];
+          value = pair[1];
         } catch(e) {
           self._entries = null;
           self._DBConn.commitTransaction();
