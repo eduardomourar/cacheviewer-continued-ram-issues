@@ -574,7 +574,7 @@ var CacheViewer = {
     */
 
     if (aEntryInfo.key.indexOf("http") === 0) {
-      this._entries.push(new Array(
+      this._entries.push([
         aEntryInfo.key,
         aEntryInfo.dataSize,
         aEntryInfo.deviceID,
@@ -584,7 +584,7 @@ var CacheViewer = {
         aEntryInfo.lastModified*1000000,
         aEntryInfo.expirationTime*1000000,
         aEntryInfo.fetchCount
-      ));
+      ]);
     }
     return true;
   },
