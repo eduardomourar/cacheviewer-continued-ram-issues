@@ -7,6 +7,7 @@
 
 	<em:id>{30E08C68-889E-11E0-95EF-DA7E4824019B}</em:id>
 	<em:version>0.7</em:version>
+	<em:type>2</em:type> <!-- https://developer.mozilla.org/en/Install_Manifests#type -->
 
 	<!-- Target Application this extension can install into,
 		with minimum and maximum supported versions. -->

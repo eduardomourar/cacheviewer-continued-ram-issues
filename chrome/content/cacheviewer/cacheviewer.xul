@@ -13,8 +13,8 @@
     persist="width height screenX screenY sizemode"
     windowtype="CacheViewer">
 
-  <stringbundleset id="strbundles">
-    <stringbundle id="strings" src="chrome://cacheviewer/locale/cacheviewer.properties"/>
+  <stringbundleset id="cvc_strbundles">
+    <stringbundle id="cvc_strings" src="chrome://cacheviewer/locale/cacheviewer.properties"/>
   </stringbundleset>
 
   <script type="application/x-javascript" src="chrome://cacheviewer/content/cacheviewer.js"/>
