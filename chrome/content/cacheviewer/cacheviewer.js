@@ -329,7 +329,7 @@ var CacheViewer = {
         lastFolder,
         lastFolderPath,
         metaData,
-        pref,
+        prefService,
         rangeMax,
         rangeMin,
         res,
@@ -354,10 +354,10 @@ var CacheViewer = {
       }
     }
 
-    pref = Cc["@mozilla.org/preferences-service;1"]
+    prefService = Cc["@mozilla.org/preferences-service;1"]
           .getService(Ci.nsIPrefService)
           .getBranch("extensions.cacheviewer.");
-    lastFolderPath = pref.getComplexValue("folder", Ci.nsISupportsString).data;
+    lastFolderPath = prefService.getComplexValue("folder", Ci.nsISupportsString).data;
     lastFolder = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
     if (lastFolderPath) {
       lastFolder.initWithPath(lastFolderPath);
@@ -386,7 +386,7 @@ var CacheViewer = {
     } else {
       str.data = fp.file.parent.path;
     }
-    pref.setComplexValue("folder", Ci.nsISupportsString, str);
+    prefService.setComplexValue("folder", Ci.nsISupportsString, str);
 
     folder = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
     folder.initWithPath(fp.file.path);
