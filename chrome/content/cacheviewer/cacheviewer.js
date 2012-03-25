@@ -80,7 +80,7 @@ var CacheViewer = {
   init: function CV_init() {
 
     this._tree = document.getElementById("cacheTree");
-    this._bundle = document.getElementById("strings");
+    this._bundle = document.getElementById("cvc_strings");
 
     this._rdf = new RDF();
     this._root = this._rdf.makeSeqContainer(this._rdf.RDF_ITEM_ROOT);
