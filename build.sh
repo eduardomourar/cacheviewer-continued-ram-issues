@@ -10,4 +10,4 @@ if [ -f cacheviewer.xpi ]; then
 	rm cacheviewer.xpi
 fi
 
-zip -qr cacheviewer.xpi . -x \*.xpi \*.DS\* \*.hg\*/\* .hgignore build.sh
+zip -qr cacheviewer.xpi . -x \*.xpi \*.DS\* \*.hg\*/\* .hgignore .hgtags build.sh
