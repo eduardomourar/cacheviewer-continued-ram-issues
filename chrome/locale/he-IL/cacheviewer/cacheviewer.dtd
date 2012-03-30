@@ -21,4 +21,4 @@
 <!ENTITY expirationTime.label "זמן תפוגה">
 <!ENTITY memory.label "זכרון:">
 <!ENTITY disk.label "דיסק:">
-<!Entity selectcount.label "Selected Items:">
+<!ENTITY selectcount.label "Selected Items:">

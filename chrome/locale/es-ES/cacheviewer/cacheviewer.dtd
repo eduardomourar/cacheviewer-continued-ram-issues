@@ -21,4 +21,4 @@
 <!ENTITY expirationTime.label "Tiempo de caducidad">
 <!ENTITY memory.label "Memoria:">
 <!ENTITY disk.label "Disco:">
-<!Entity selectcount.label "Selected Items:">
+<!ENTITY selectcount.label "Selected Items:">
