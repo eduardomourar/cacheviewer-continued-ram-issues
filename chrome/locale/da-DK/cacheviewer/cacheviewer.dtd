@@ -21,3 +21,4 @@
 <!ENTITY expirationTime.label "Udløbsdato">
 <!ENTITY memory.label "Hukommelse:">
 <!ENTITY disk.label "Disk:">
+<!ENTITY selectcount.label "Markerede elementer:">
