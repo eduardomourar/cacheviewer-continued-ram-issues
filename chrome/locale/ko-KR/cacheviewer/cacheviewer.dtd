@@ -21,3 +21,4 @@
 <!ENTITY expirationTime.label "유효기간">
 <!ENTITY memory.label "메모리:">
 <!ENTITY disk.label "디스크:">
+<!Entity selectcount.label "Selected Items:">
