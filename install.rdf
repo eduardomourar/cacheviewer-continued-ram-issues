@@ -32,8 +32,9 @@
 	<em:developer>James Sumners</em:developer>
 	<!--<em:homepageURL>http://jrfom.com/</em:homepageURL>-->
 
+	<!-- Original CV contributors -->
 	<em:translator>The Zero</em:translator>		<!-- cs-CZ -->
-	<em:translator>Joergen</em:translator>		<!-- da-DK -->
+	<!--em:translator>Joergen</em:translator-->		<!-- da-DK -->
 	<em:translator>Team erweiterungen.de</em:translator>	<!-- de-DE -->
 	<em:translator>chuzo</em:translator>		<!-- es-ES -->
 	<em:translator>myahoo</em:translator>		<!-- fr-FR -->
@@ -51,6 +52,9 @@
 	<em:translator>tymofiy</em:translator>		<!-- uk-UA -->
 	<em:translator>WangKing</em:translator>		<!-- zh-CN -->
 	<em:translator>shyangs</em:translator>		<!-- zh-TW -->
+
+	<!-- CVC contributors -->
+	<em:translator>Jørgen Rasmussen</em:translator> <!-- da-DK -->
 
 	</Description>
 
