@@ -21,3 +21,4 @@
 <!ENTITY expirationTime.label "Ablaufdatum">
 <!ENTITY memory.label "Arbeitsspeicher:">
 <!ENTITY disk.label "Festplatte:">
+<!Entity selectcount.label "Selected Items:">

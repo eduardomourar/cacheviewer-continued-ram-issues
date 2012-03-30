@@ -21,3 +21,4 @@
 <!ENTITY expirationTime.label "Vervaldatum/-tijd">
 <!ENTITY memory.label "Geheugen:">
 <!ENTITY disk.label "Schijf:">
+<!Entity selectcount.label "Selected Items:">

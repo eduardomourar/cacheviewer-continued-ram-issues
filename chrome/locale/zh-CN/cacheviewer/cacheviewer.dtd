@@ -21,3 +21,4 @@
 <!ENTITY expirationTime.label "过期时间">
 <!ENTITY memory.label "内存：">
 <!ENTITY disk.label "硬盘：">
+<!Entity selectcount.label "Selected Items:">

@@ -21,3 +21,4 @@
 <!ENTITY expirationTime.label "انتهاء الوقت">
 <!ENTITY memory.label "الذاكرة:">
 <!ENTITY disk.label "القرص:">
+<!Entity selectcount.label "Selected Items:">
