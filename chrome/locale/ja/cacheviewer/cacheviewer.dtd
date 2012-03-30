@@ -25,4 +25,4 @@
 
 <!ENTITY	memory.label		"メモリー：">
 <!ENTITY	disk.label			"ディスク：">
-<!Entity selectcount.label "Selected Items:">
+<!ENTITY selectcount.label "Selected Items:">

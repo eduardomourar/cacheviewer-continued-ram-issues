@@ -21,4 +21,4 @@
 <!ENTITY expirationTime.label "Zamanaşımı süresi">
 <!ENTITY memory.label "Hafıza:">
 <!ENTITY disk.label "Disk:">
-<!Entity selectcount.label "Selected Items:">
+<!ENTITY selectcount.label "Selected Items:">

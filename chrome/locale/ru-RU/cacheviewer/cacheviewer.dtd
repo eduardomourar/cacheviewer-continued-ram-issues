@@ -21,4 +21,4 @@
 <!ENTITY expirationTime.label "Срок действия">
 <!ENTITY memory.label "Кэш памяти:">
 <!ENTITY disk.label "Дисковый кэш:">
-<!Entity selectcount.label "Selected Items:">
+<!ENTITY selectcount.label "Selected Items:">

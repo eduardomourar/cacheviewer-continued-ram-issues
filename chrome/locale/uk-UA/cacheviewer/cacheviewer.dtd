@@ -21,4 +21,4 @@
 <!ENTITY expirationTime.label "Час життя">
 <!ENTITY memory.label "Пам’ять:">
 <!ENTITY disk.label "Диск:">
-<!Entity selectcount.label "Selected Items:">
+<!ENTITY selectcount.label "Selected Items:">
