@@ -21,3 +21,4 @@
 <!ENTITY expirationTime.label "有效期限">
 <!ENTITY memory.label "記憶體:">
 <!ENTITY disk.label "磁碟:">
+<!ENTITY selectcount.label "選取的項目:">
