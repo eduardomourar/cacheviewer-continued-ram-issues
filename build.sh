@@ -7,7 +7,11 @@ if [ "${ZIP:(-3)}" != "zip" ]; then
 fi
 
 if [ -f cacheviewer.xpi ]; then
-	rm cacheviewer.xpi
+	rm cacheviewer*.xpi
 fi
 
 zip -qr cacheviewer.xpi . -x \*.xpi \*.DS\* \*.hg\*/\* .hgignore .hgtags build.sh
+
+HGNODE=$(hg hist -r -1 --template "{node}")
+HGNODE=${HGNODE:0:12} # short form of Hg changeset id
+cp cacheviewer.xpi cacheviewer-${HGNODE}.xpi
