@@ -21,4 +21,4 @@
 <!ENTITY expirationTime.label "Data wygaśnięcia">
 <!ENTITY memory.label "Liczba wpisów:">
 <!ENTITY disk.label "Dysk:">
-<!ENTITY selectcount.label "Selected Items:">
+<!ENTITY selectcount.label "Zaznaczonych elementów:">
