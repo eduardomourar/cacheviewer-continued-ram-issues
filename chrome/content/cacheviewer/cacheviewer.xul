@@ -66,6 +66,18 @@
         <label value="&search.label;" accesskey="&search.accesskey;" control="search"/>
         <textbox id="search" flex="1"
                timeout="500" oncommand="CacheViewer.search(this.value);"/>
+		
+        <button type="menu" id="showdevice" label="&device.label;">
+		  <menupopup>
+			<menuitem type="checkbox" id="devicememory" label="memory"
+			  oncommand="CacheViewer.showDeviceType();" checked="true"/>
+			<menuitem type="checkbox" id="devicedisk" label="disk"
+			  oncommand="CacheViewer.showDeviceType();" checked="true"/>
+			<menuitem type="checkbox" id="deviceoffline" label="offline"
+			  oncommand="CacheViewer.showDeviceType();" checked="true"/>
+		  </menupopup>
+		</button>
+		
         <button id="showall" label="&showall.label;" accesskey="&showall.accesskey;"
             oncommand="CacheViewer.showAll();" disabled="true"/>
       </hbox>
@@ -110,6 +122,10 @@
       <treecol id="fetchCount" label="&fetchCount.label;" flex="1" hidden="true"
              sort="rdf:http://park2.wakwak.com/~benki/cacheviewer#cnt"
              persist="width hidden ordinal sortActive sortDirection"/>
+      <splitter class="tree-splitter"/>
+      <treecol id="dateCreated" label="Creation Date" flex="1" hidden="true"
+             sort="rdf:http://park2.wakwak.com/~benki/cacheviewer#date"
+             persist="width hidden ordinal sortActive sortDirection"/>
     </treecols>
 
     <template>
@@ -124,6 +140,7 @@
             <treecell label="rdf:http://park2.wakwak.com/~benki/cacheviewer#mod"/>
             <treecell label="rdf:http://park2.wakwak.com/~benki/cacheviewer#exp"/>
             <treecell label="rdf:http://park2.wakwak.com/~benki/cacheviewer#cnt"/>
+            <treecell label="rdf:http://park2.wakwak.com/~benki/cacheviewer#date"/>
           </treerow>
         </treeitem>
       </treechildren>

@@ -106,19 +106,24 @@ var CacheViewer = {
       this._DBConn.executeSimpleSQL("DROP TABLE cacheentries");
       //this._DBConn.executeSimpleSQL("VACUUM");
     }
+	//--- EMR 2012-11-30 ---//
+	//--- Added device field to SQL table to use on filter ---//
     this._DBConn.createTable("cacheentries", "\
       id INTEGER PRIMARY KEY, \
       key TEXT, \
-      type TEXT");
+      type TEXT, \
+      dev TEXT");
 
     this._visitAll = true;
     this._entries = [];
     this._cacheService.visitEntries(this);
+    
+    var countCache = 0;
 
     var it = new Iterator(this._entries);
 
-    var timer = Components.classes["@mozilla.org/timer;1"]
-          .createInstance(Components.interfaces.nsITimer);
+    var timer = Cc["@mozilla.org/timer;1"]
+          .createInstance(Ci.nsITimer);
 
     var keyProperty = this._rdf.getResource(this._rdf.NS_CACHEVIEWER+"key");
     var sizeProperty = this._rdf.getResource(this._rdf.NS_CACHEVIEWER+"size");
@@ -130,6 +135,10 @@ var CacheViewer = {
     var expProperty = this._rdf.getResource(this._rdf.NS_CACHEVIEWER+"exp");
     var cntProperty = this._rdf.getResource(this._rdf.NS_CACHEVIEWER+"cnt");
     var typeProperty = this._rdf.getResource(this._rdf.NS_CACHEVIEWER+"type");
+    
+	//--- EMR 2012-11-30 ---//
+	//--- Add date property ---//
+    var dateProperty = this._rdf.getResource(this._rdf.NS_CACHEVIEWER+"date");
 
     // local cache
     var ds = this._rdf.datasource;
@@ -139,7 +148,7 @@ var CacheViewer = {
 
     // Init labels
     document.getElementById("selectionCountLabel").textContent =
-      this._tree.view.selection.count;
+    	this._tree.view.selection.count;
 
     function timerCallback() {}
     timerCallback.prototype = {
@@ -152,6 +161,8 @@ var CacheViewer = {
             pair,
             resource,
             session,
+            dateCache,
+            dateMod,
             type,
             value;
 
@@ -159,6 +170,7 @@ var CacheViewer = {
           pair = it.next();
           index = pair[0];
           value = pair[1];
+          countCache++;
         } catch(e) {
           self._entries = null;
           self._DBConn.commitTransaction();
@@ -189,12 +201,14 @@ var CacheViewer = {
         ds.Assert(resource, cntProperty, rs.GetIntLiteral(value[8]), true);
 
         // inline getMimeType
+        dateMod = new Date(value[6]/1000);
         try {
           session = self._cacheService.createSession(value[3], Ci.nsICache.STORE_ANYWHERE, value[4]);
           session.doomEntriesIfExpired = false;
           descriptor = session.openCacheEntry(value[0], Ci.nsICache.ACCESS_READ, false);
         } catch(e) {
           ds.Assert(resource, typeProperty, rs.GetLiteral("-"), true);
+          ds.Assert(resource, dateProperty, rs.GetDateLiteral(dateMod), true);
           timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
           return;
         }
@@ -203,11 +217,29 @@ var CacheViewer = {
         } catch(e) {
           descriptor.close();
           ds.Assert(resource, typeProperty, rs.GetLiteral("-"), true);
+          ds.Assert(resource, dateProperty, rs.GetDateLiteral(dateMod), true);
           timer.init(new timerCallback(), 0, timer.TYPE_ONE_SHOT);
           return;
         }
         descriptor.close();
+        
+		//--- EMR 2012-11-30 ---//
+		//--- Add date extraction from response header ---//
+        dateCache = dateMod;
+        a = head.indexOf("Date: ");
+        if (a > 0) {
+          b = head.indexOf("\n", a+6);
+          dateCache = head.substring(a+6, b-1);
 
+          b = dateCache.indexOf(";");
+          if (b > 0) {
+            dateCache = dateCache.substring(0, b);
+          }
+          dateCache = (Date.parse(dateCache)*1000) + (dateMod.getMinutes()*10000) + (dateMod.getSeconds()*100) + (countCache%100);
+          //alert(dateCache + " | " + dateMod + " | " + value[6]);
+        }
+        ds.Assert(resource, dateProperty, rs.GetDateLiteral(dateCache), true);
+        
         // Don't use RegExp
         type = "-";
         a = head.indexOf("Content-Type: ");
@@ -222,7 +254,9 @@ var CacheViewer = {
         }
         ds.Assert(resource, typeProperty, rs.GetLiteral(type), true);
 
-        self._DBConn.executeSimpleSQL("INSERT INTO cacheentries (id, key, type) VALUES (" + index + ", '" + value[0] + "', '" + type + "')");
+		//--- EMR 2012-11-30 ---//
+		//--- Add device field to SQL table to use on filter ---//
+        self._DBConn.executeSimpleSQL("INSERT INTO cacheentries (id, key, type, dev) VALUES (" + index + ", '" + value[0] + "', '" + type + "', '" + value[2] + "')");
 
         //self._getMimeType(resource, value[0], value[3], value[4]);
         //self._rdf.datasource.endUpdateBatch();
@@ -307,6 +341,10 @@ var CacheViewer = {
     this.__cacheService = null;
 
     this.init();
+    
+    //--- EMR 2012-11-30 ---//
+    //--- Not reloading with filters set (search or showdevice), removed all ---//
+    this.showAll();
   },
 
   saveCache: function CV_saveCache() {
@@ -371,7 +409,8 @@ var CacheViewer = {
       fp.init(window, null, Ci.nsIFilePicker.modeSave);
       fp.defaultString = this._guessFileName(
         this._rdf.getLiteralProperty(selection[0], this._rdf.NS_CACHEVIEWER+"key"),
-        this._rdf.getLiteralProperty(selection[0], this._rdf.NS_CACHEVIEWER+"type")
+        this._rdf.getLiteralProperty(selection[0], this._rdf.NS_CACHEVIEWER+"type"),
+        this._rdf.getDateProperty(selection[0], this._rdf.NS_CACHEVIEWER+"date")
       );
     }
     fp.displayDirectory = lastFolder;
@@ -397,7 +436,8 @@ var CacheViewer = {
       stream = this._rdf.getIntProperty(selection[i], this._rdf.NS_CACHEVIEWER+"strm");
       device = this._rdf.getLiteralProperty(selection[i], this._rdf.NS_CACHEVIEWER+"dev");
       type = this._rdf.getLiteralProperty(selection[i], this._rdf.NS_CACHEVIEWER+"type");
-
+      dateCache = this._rdf.getDateProperty(selection[i], this._rdf.NS_CACHEVIEWER+"date");
+      
       descriptor = this._openCacheEntry(key, client, stream);
       if (!descriptor) {
         continue;
@@ -405,7 +445,7 @@ var CacheViewer = {
 
       file = folder.clone();
       if (selection.length > 1)
-        file.append(this._guessFileName(key, type));
+      	file.append(this._guessFileName(key, type, dateCache));
 
       if (res == Ci.nsIFilePicker.returnReplace) {
         if (!file.exists()) {
@@ -461,38 +501,63 @@ var CacheViewer = {
   search: function CV_search(aSearchString) {
     var searchContainer,
         statement;
+    
+	//--- EMR 2012-11-30 ---//
+	//--- Added device field to filter ---//
+    var devMemory = (document.getElementById("devicememory").getAttribute("checked") == "true");
+    var devDisk = (document.getElementById("devicedisk").getAttribute("checked") == "true");
+	var devOffline = (document.getElementById("deviceoffline").getAttribute("checked") == "true");
 
     aSearchString = aSearchString.replace(/^ +/, "");
-
-    if (aSearchString) {
-      this._rdf.datasource.beginUpdateBatch();
-      this._rdf.removeResource(this._rdf.getResource(this._rdf.RDF_ITEM_SEARCH), null);
-
-      statement = this._DBConn.createStatement("SELECT id FROM cacheentries WHERE key||type LIKE '%"+ aSearchString.replace(/ +/g, " ").replace(/ $/, "").split(" ").join("%' AND key||type LIKE '%") +"%'");
-
-      searchContainer = this._rdf.getContainer(this._rdf.RDF_ITEM_SEARCH);
-      while (statement.executeStep()) {
-        searchContainer.AppendElement(this._rdf.getResource(statement.getInt32(0)));
-
-      }
-      this._rdf.datasource.endUpdateBatch();
-
-      statement.reset();
-      statement.finalize();
-      statement = null;
-
-      this._tree.ref = this._rdf.RDF_ITEM_SEARCH;
-    } else {
-      this._tree.ref = this._rdf.RDF_ITEM_ROOT;
-    }
+    
     document.getElementById("showall").disabled = !aSearchString;
+    //alert(aSearchString + " " + devMemory + " " + devDisk + " " + devOffline);
+    
+	if ((!aSearchString) && devMemory && devDisk && devOffline) {
+		this._tree.ref = this._rdf.RDF_ITEM_ROOT;
+	} else {
+		if (!aSearchString) { aSearchString = "";};
+		this._rdf.datasource.beginUpdateBatch();
+		this._rdf.removeResource(this._rdf.getResource(this._rdf.RDF_ITEM_SEARCH), null);
+		
+		//--- EMR 2012-11-30 ---//
+		//--- Added device types to SQL WHERE statement ---//
+		statement = this._DBConn.createStatement("SELECT id FROM cacheentries WHERE (dev='" + (devMemory ? "memory" : "") +
+			"' OR dev='" + (devDisk ? "disk" : "") + "' OR dev='" + (devOffline ? "offline" : "") + "') AND key||type LIKE '%"+
+			aSearchString.replace(/ +/g, " ").replace(/ $/, "").split(" ").join("%' AND key||type LIKE '%") + "%'");
+		
+		searchContainer = this._rdf.getContainer(this._rdf.RDF_ITEM_SEARCH);
+		while (statement.executeStep()) {
+			searchContainer.AppendElement(this._rdf.getResource(statement.getInt32(0)));
+		}
+		this._rdf.datasource.endUpdateBatch();
+		
+		statement.reset();
+		statement.finalize();
+		statement = null;
+		
+		this._tree.ref = this._rdf.RDF_ITEM_SEARCH;
+	}
   },
 
   showAll: function CV_showAll() {
+	//--- EMR 2012-11-30 ---//
+	//--- Check all device types ---//
+  	document.getElementById("devicememory").setAttribute("checked", "true");
+  	document.getElementById("devicedisk").setAttribute("checked", "true");
+  	document.getElementById("deviceoffline").setAttribute("checked", "true");
+  	
     var textbox = document.getElementById("search");
     textbox.value = "";
     textbox.focus();
     this.search("");
+  },
+  
+  //--- EMR 2012-11-30 ---//
+  //--- Implementation of device filter using search function ---//
+  showDeviceType: function CV_showDeviceType() {
+    var textbox = document.getElementById("search");
+    this.search(textbox.value);
   },
 
   onSelect: function CV_onSelect() {
@@ -503,7 +568,7 @@ var CacheViewer = {
         timerCallback = function(){};
 
     if (sel.count === 1) {
-      timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
+      timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
       self = this;
       timerCallback.prototype = {
         observe: function(aTimer, aTopic, aData) {
@@ -603,7 +668,7 @@ var CacheViewer = {
     return true;
   },
 
-  // ***** Helper funcitons *****
+  // ***** Helper functions *****
   _makePreview: function CV__makePreview(aRow) {
     var cacheFile,
         client,
@@ -615,7 +680,7 @@ var CacheViewer = {
         self = this,
         stream,
         type,
-        url,
+        dataURI,
         value;
 
 
@@ -624,6 +689,7 @@ var CacheViewer = {
     type = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"type");
     client = this._rdf.getLiteralProperty(resource, this._rdf.NS_CACHEVIEWER+"clnt");
     stream = this._rdf.getIntProperty(resource, this._rdf.NS_CACHEVIEWER+"strm");
+	dateCache = this._rdf.getDateProperty(resource, this._rdf.NS_CACHEVIEWER+"date");
 
     descriptor = this._openCacheEntry(key, client, stream);
     if (!descriptor) return;
@@ -653,26 +719,55 @@ var CacheViewer = {
     this._metaData = "";
     descriptor.visitMetaData(this);
     value += this._metaData;
-    descriptor.close();
 
     document.getElementById("cacheInfo").value = value;
 
-    url = "chrome://cacheviewer/content/not_image.png";
+	//--- EMR 2012-11-30 ---//
+	//--- Changed variable url to dataURI, because now a data is being used in addition to location ---//
+    dataURI = "chrome://cacheviewer/content/not_image.png";
 
     if ((type.indexOf("image") === 0) ||
       (key.match(/.*(\.png|\.gif|\.jpg|\.ico|\.bmp)$/i))) {
-        //url = "about:cacheviewer?"+key;
+        //dataURI = "about:cacheviewer?"+key;
         if (cacheFile !== null) {
-          // Use the local file
-          url = "file://" + cacheFile.path;
+            // Use the local file
+            dataURI = "file://" + cacheFile.path;
         } else {
-          // Use the remote file
-          url = key;
+			// Use the remote file
+			dataURI = key;
+			
+			//--- EMR 2012-11-30 ---//
+			//--- Added handling of images from memory, specially ASP.NET dynamic-generated images ---//
+			if (device == "memory") {
+				var binaryInputStream = Cc["@mozilla.org/binaryinputstream;1"].createInstance(Ci.nsIBinaryInputStream);
+				binaryInputStream.setInputStream(descriptor.openInputStream(0));
+				var content = binaryInputStream.readBytes(binaryInputStream.available());
+				var dataURI = "data:" + type + ";base64," + convertToBase64(content);
+				
+				//alert(stream + " | " + client + " | " + key + " | " + dataURI)
+				// Saving preview directly to file
+				var file = Cc["@mozilla.org/file/local;1"].
+						   createInstance(Ci.nsILocalFile);
+				file.initWithPath("/Users/eduardo_demoura/Desktop/Interesses/Facul/Estacio - EAD/ADS - Análise e Desenvolvimento de Sistemas/PERIODO1/LIVROS/");
+			  	file.append(this._guessFileName(key, type, dateCache));
+				if (!file.exists()) {
+				  file.create(Ci.nsILocalFile.NORMAL_FILE_TYPE, 0666);
+				}
+				fileOutputStream = Cc["@mozilla.org/network/file-output-stream;1"].createInstance(Ci.nsIFileOutputStream);
+				fileOutputStream.init(file, -1, 0666, 0);
+				fileOutputStream.write(content, content.length);
+				fileOutputStream.flush();
+				fileOutputStream.close();
+				
+			  	binaryInputStream.close();
+			}
         }
     }
+    
+    descriptor.close();
 
     image = document.getElementById("previewImage");
-    image.src = url;
+    image.src = dataURI;
     if (image.hasAttribute("style")) {
       image.removeAttribute("style");
     }
@@ -711,7 +806,7 @@ var CacheViewer = {
     return resources;
   },
 
-  _guessFileName: function CV__geussFileName(aKey, aMimeType) {
+  _guessFileName: function CV__guessFileName(aKey, aMimeType, aDate) {
     var ext,
         fileInfo = new FileInfo(),
         URI,
@@ -721,8 +816,14 @@ var CacheViewer = {
     URI = URIFix.createFixupURI(aKey, 0);
     initFileInfo(fileInfo, URI.spec, null, null, null, null);
     ext = fileInfo.fileExt;
+    
+	//--- EMR 2012-11-30 ---//
+	//--- Added ASP.NET file renaming ---//
+    if (ext.indexOf("ashx") >= 0) {
+    	fileInfo.fileBaseName = aDate;
+    }
 
-    if ((aMimeType != "text/html") && (ext.indexOf("htm") >= 0)) {
+    if ((aMimeType != "text/html") && (ext.indexOf("htm") >= 0 || ext.indexOf("ashx") >= 0)) {
       if (aMimeType == "image/jpeg")
         ext = "jpg";
       else if (aMimeType == "image/gif")
@@ -830,6 +931,86 @@ var CacheViewer = {
     }
   }
 };
+
+
+//--- EMR 2012-11-30 ---//
+// ***** Base64 functions from http://www.sensefulsolutions.com/2012/01/viewing-chrome-cache-easy-way.html *****
+function getBase64Char(base64Value) {
+	if (base64Value < 0) {
+		throw "Invalid number: " + base64Value;
+	} else if (base64Value <= 25) {
+		// A-Z
+		return String.fromCharCode(base64Value + "A".charCodeAt(0));
+	} else if (base64Value <= 51) {
+		// a-z
+		base64Value -= 26; // a
+		return String.fromCharCode(base64Value + "a".charCodeAt(0));
+	} else if (base64Value <= 61) {
+		// 0-9
+		base64Value -= 52; // 0
+		return String.fromCharCode(base64Value + "0".charCodeAt(0));
+	} else if (base64Value <= 62) {
+		return '+';
+	} else if (base64Value <= 63) {
+		return '/';
+	} else {
+		throw "Invalid number: " + base64Value;
+	}
+}
+
+function convertToBase64(input) {
+	// http://en.wikipedia.org/wiki/Base64#Example
+	var remainingBits;
+	var result = "";
+	var additionalCharsNeeded = 0;
+
+	var charIndex = -1;
+	var charAsciiValue;
+	var advanceToNextChar = function() {
+		charIndex++;
+		charAsciiValue = input.charCodeAt(charIndex);
+		return charIndex < input.length;
+	};
+
+	while (true) {
+		var base64Char;
+
+		// handle 1st char
+		if (!advanceToNextChar()) break;
+		base64Char = charAsciiValue >>> 2;
+		remainingBits = charAsciiValue & 3; // 0000 0011
+		result += getBase64Char(base64Char); // 1st char
+		additionalCharsNeeded = 3;
+
+		// handle 2nd char
+		if (!advanceToNextChar()) break;
+		base64Char = (remainingBits << 4) | (charAsciiValue >>> 4);
+		remainingBits = charAsciiValue & 15; // 0000 1111
+		result += getBase64Char(base64Char); // 2nd char
+		additionalCharsNeeded = 2;
+
+		// handle 3rd char
+		if (!advanceToNextChar()) break;
+		base64Char = (remainingBits << 2) | (charAsciiValue >>> 6);
+		result += getBase64Char(base64Char); // 3rd char
+		remainingBits = charAsciiValue & 63; // 0011 1111
+		result += getBase64Char(remainingBits); // 4th char
+		additionalCharsNeeded = 0;
+	}
+
+	// there may be an additional 2-3 chars that need to be added
+	if (additionalCharsNeeded == 2) {
+		remainingBits = remainingBits << 2; // 4 extra bits
+		result += getBase64Char(remainingBits) + "=";
+	} else if (additionalCharsNeeded == 3) {
+		remainingBits = remainingBits << 4; // 2 extra bits
+		result += getBase64Char(remainingBits) + "==";
+	} else if (additionalCharsNeeded != 0) {
+		throw "Unhandled number of additional chars needed: " + additionalCharsNeeded;
+	}
+
+	return result;
+}
 
 // ***** StreamListener for Asynchronous Converter *****
 function StreamListener(aFile) {
